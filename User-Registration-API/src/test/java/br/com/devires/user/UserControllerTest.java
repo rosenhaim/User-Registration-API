@@ -18,18 +18,16 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.RequestBuilder;
-import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 
 import br.com.devires.user.controller.UserController;
 import br.com.devires.user.model.User;
 import br.com.devires.user.repositories.UserRespository;
-import ch.qos.logback.core.net.ObjectWriter;
+
 
 @RunWith(MockitoJUnitRunner.class)
 public class UserControllerTest {
@@ -66,13 +64,10 @@ public class UserControllerTest {
 		
 		Mockito.when(userRespository.findAll()).thenReturn(records);
 		
-		mockMvc.perform((RequestBuilder) ((ResultActions) MockMvcRequestBuilders
-				.get("/users")
+		mockMvc.perform( MockMvcRequestBuilders
+				.get("/v1/users")
 				.contentType(MediaType.APPLICATION_JSON))
-				.andExpect(status().isOk())
-				
-				
-				);
+				.andExpect(status().isOk());
 	}
 	
 	
