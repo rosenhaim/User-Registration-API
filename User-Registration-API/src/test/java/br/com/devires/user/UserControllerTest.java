@@ -66,8 +66,7 @@ public class UserControllerTest {
 	@InjectMocks
 	private 	UserController		userController;
 	
-	@InjectMocks
-	private     UserService			userService;
+
 	
 	ObjectMapper 		objectMapper		= 	new 	ObjectMapper();	
 	ObjectWriter		objectWriter		=	(ObjectWriter) objectMapper.writer(); 
@@ -79,7 +78,7 @@ public class UserControllerTest {
 
 	@Before
 	public void setUp() {
-		MockitoAnnotations.initMocks(this);
+		
 		this.mockMvc	=	MockMvcBuilders.standaloneSetup(userController).build();
 		
 		
