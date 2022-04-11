@@ -49,9 +49,7 @@ import br.com.devires.user.service.UserService;
  * @author rosenhaim
  *
  */
-//@RunWith(MockitoJUnitRunner.class)
-//@WebMvcTest(controllers = UserController.class)
-//@ActiveProfiles("test")
+
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
