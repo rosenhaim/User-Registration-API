@@ -1,9 +1,19 @@
 package br.com.devires.user;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.text.SimpleDateFormat;
@@ -14,6 +24,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -63,6 +74,8 @@ public class UserControllerTest {
 	
 	@InjectMocks
 	private 	UserController		userController;
+	
+	private final String BASE_URL = "/v1/users";
 	
 
 	
@@ -128,8 +141,39 @@ public class UserControllerTest {
 		}
 	
 	
+	@Test
+	public void getById() throws Exception{
+		
+		 
+		@SuppressWarnings("deprecation")
+		User user = new User( 1,
+					"John Smith" ,
+					"string",
+					new Date("21/07-1988"),
+					new Date(),
+					new Date(), false);	
 	
+		 when(userRepository.save(any(User.class))).thenReturn(user);
+
+		 when(userRepository.findById(1)).thenReturn(Optional.of(user));
+		
+		
+		mockMvc.perform(post("/v1/users")
+	            .contentType("application/json")
+	            .content(objectMapper.writeValueAsString(user)))
+	            .andExpect(status().isOk());
 	
+        			mockMvc.perform( MockMvcRequestBuilders
+        					.get(BASE_URL + "/1")
+        					.contentType(MediaType.APPLICATION_JSON))
+        					.andExpect(status().isOk())
+        					.andExpect(content().contentType("application/json"))
+         					.andExpect(jsonPath("$.id", is(1)))
+                			.andExpect(jsonPath("$.name", is("John Smith")));
+        	
+		
+	}
 	
+
 	
 }
