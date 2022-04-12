@@ -1,22 +1,20 @@
 package br.com.devires.user;
 
-import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
+import io.restassured.http.ContentType;
+import org.springframework.http.HttpStatus;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -24,21 +22,16 @@ import java.util.List;
 import java.util.Optional;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -50,7 +43,6 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import br.com.devires.user.controller.UserController;
 import br.com.devires.user.model.User;
 import br.com.devires.user.repositories.UserRespository;
-import br.com.devires.user.service.UserService;
 
 
 
@@ -87,7 +79,7 @@ public class UserControllerTest {
 	User				RECORD_1			=	new 	User( 10, "John Smith" , "string", new Date("21/07-1988"), new Date(), new Date(), false);			
 	User				RECORD_2			=	new 	User( 2, "Jack Sparrow" , "Maior pirata", new Date("05/05/1979"), new Date(), new Date(), false);			
 
-	@Before
+	@BeforeEach
 	public void setUp() {
 		
 		this.mockMvc	=	MockMvcBuilders.standaloneSetup(userController).build();
@@ -173,7 +165,33 @@ public class UserControllerTest {
         	
 		
 	}
-	
 
+	@Test
+public void notFindUser() {
+	when(this.userRepository.findById(5)).thenReturn(null);
 	
+	given()
+	.accept(ContentType.JSON)
+.when()
+	.get("/v1/users/{codigo}", 5)
+.then()
+	.statusCode(HttpStatus.NOT_FOUND.value());
+	
+}
+
+
+
+
+@Test
+public void returnBadRequest_searchUser() {
+	
+	given()
+		.accept(ContentType.JSON)
+	.when()
+		.get("/v1/users/{codigo}", -1)
+	.then()
+		.statusCode(HttpStatus.BAD_REQUEST.value());
+	
+	verify(this.userRepository, never()).getById(-1);
+}
 }
