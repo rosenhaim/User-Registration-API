@@ -196,17 +196,20 @@ assertEquals(404, statusCode);
 
 
 
-/*
+
 @Test
 public void returnBadRequest_searchUser() {
 	
-	given()
+	int statusCode = given()
 		.accept(ContentType.JSON)
 	.when()
-		.get("/v1/users/{codigo}", -1)
-	.then()
-		.statusCode(HttpStatus.BAD_REQUEST.value());
+		.get("/v1/users/{codigo}", -10)
+//	.then()
+//		.statusCode(HttpStatus.BAD_REQUEST.value());
+		.andReturn().statusCode();
 	
-	verify(this.userRepository, never()).getById(-1);
-}*/
+	//verify(this.userRepository, never()).getById(-1);
+	
+	assertEquals(404, statusCode);
+}
 }
