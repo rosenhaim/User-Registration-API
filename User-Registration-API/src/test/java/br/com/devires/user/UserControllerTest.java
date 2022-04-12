@@ -49,8 +49,7 @@ import br.com.devires.user.repositories.UserRespository;
 
 
 /**
- * Please 
-* to run my test  run with configuration : JUnit 4 
+ * 
  * @author rosenhaim
  *
  */
