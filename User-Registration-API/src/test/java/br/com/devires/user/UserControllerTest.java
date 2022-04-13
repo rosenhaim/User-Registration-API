@@ -26,14 +26,18 @@ import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -44,7 +48,8 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 
 import br.com.devires.user.controller.UserController;
 import br.com.devires.user.model.User;
-import br.com.devires.user.repositories.UserRespository;
+import br.com.devires.user.repositories.UserRepository;
+import br.com.devires.user.service.UserService;
 
 
 
@@ -62,8 +67,8 @@ public class UserControllerTest {
 	@Autowired
 	private 	MockMvc 			mockMvc;
 	
-	@Mock
-	private		UserRespository		userRepository;
+	@MockBean
+	private		UserRepository		userRepository;
 	
 	@InjectMocks
 	private 	UserController		userController;
@@ -78,7 +83,7 @@ public class UserControllerTest {
 	
 			
 	User				RECORD_1			=	new 	User( 10, "John Smith" , "string", new Date("21/07-1988"), new Date(), new Date(), false);			
-	User				RECORD_2			=	new 	User( 2, "Jack Sparrow" , "Maior pirata", new Date("05/05/1979"), new Date(), new Date(), false);			
+	User				RECORD_2			=	new 	User( 2, "Jack Sparrow" , "pirata", new Date("05/05/1979"), new Date(), new Date(), false);			
 
 	@Before
 	public void setUp() {
@@ -109,7 +114,7 @@ public class UserControllerTest {
 	
 	/**
 	 * 11abril 
-	 * Rosenhaim 
+	 * @author rosenhaim  
 	 */
 	@Test
 	public void UserTest() {
@@ -123,14 +128,16 @@ public class UserControllerTest {
 	/**
 	 * 11abril 
 	 * Rosenhaim teste de erro ao pesquisar um usuário não cadastrado
+	 * @throws UserNotFoundException 
 	 */
 	@Test
-	public void erroFindUserById() {
+	public void erroFindUserById() throws UserNotFoundException {
 		
 		User 	user 	=	new User( 10, "John Smith" , "string", new Date("21/07-1988"), new Date(), new Date(), false);
 		userRepository.save(user);
 		
 		User    	userSearch = userRepository.getById(10);
+		
 		
 		assertFalse( userRepository.findById(1).isPresent());
 		}
@@ -170,18 +177,10 @@ public class UserControllerTest {
 	}
 
 	@Test
-public void notFindUser() {
+public void notFindUser() throws UserNotFoundException {
 		
-		 //RestAssuredMockMvc.mockMvc(mockMvc);
+
 	when(this.userRepository.findById(5)).thenReturn(null);
-	
-//	given()
-////    .standaloneSetup(new UserController(userRepository))
-//	//.accept(ContentType.JSON)
-//.when()
-//	.get("/v1/users/{codigo}", 5)
-//.then()
-//	.statusCode(HttpStatus.NOT_FOUND.value());
 	
 	
 int statusCode = 	given()
@@ -203,11 +202,9 @@ public void returnBadRequest_searchUser() {
 		.accept(ContentType.JSON)
 	.when()
 		.get("/v1/users/{codigo}", -10)
-//	.then()
-//		.statusCode(HttpStatus.BAD_REQUEST.value());
+
 		.andReturn().statusCode();
 	
-	//verify(this.userRepository, never()).getById(-1);
 	
 	assertEquals(404, statusCode);
 }

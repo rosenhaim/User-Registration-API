@@ -7,6 +7,6 @@ import br.com.devires.user.model.User;
 
 
 @Repository
-public interface UserRespository extends JpaRepository<User, Integer> {
+public interface UserRepository extends JpaRepository<User, Integer> {
 
 }

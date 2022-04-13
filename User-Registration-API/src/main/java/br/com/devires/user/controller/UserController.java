@@ -18,34 +18,21 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.devires.user.UserNotFoundException;
 import br.com.devires.user.dto.MessageResponseDTO;
 import br.com.devires.user.model.User;
-import br.com.devires.user.repositories.UserRespository;
+import br.com.devires.user.repositories.UserRepository;
+import br.com.devires.user.service.UserService;
 
 @RestController
 @RequestMapping(path="/v1/users")
 public class UserController {
 	
-	private UserRespository userRepository;
 	
 	@Autowired
-	public UserController(UserRespository userRespository) {
-		super();
-		this.userRepository = userRespository;
-	}
+	private UserService userService;
 	
 	
-	/**
-	 * Versão 1.0  - Rosenhaim - 05/04/2022
-	 * @param user
-	 * @return
-	 */
-//	@PostMapping
-//	public ResponseEntity<User> save(@RequestBody User user)
-//	{
-//		userRepository.save(user);
-//		return new ResponseEntity<>(user, HttpStatus.OK);
-//	}
 	
 	/**
 	 * Versão 1.1 - Rosenhaim - 05/04/2022
@@ -55,7 +42,7 @@ public class UserController {
 	public MessageResponseDTO createUser(@RequestBody User user) {
 		user.setUpdatedAt(new Date());
 	    user.setCreatedAt(new Date());
-		User savedUser = userRepository.save(user);
+		User savedUser = userService.save(user);
 		
 		
 		return MessageResponseDTO
@@ -67,16 +54,16 @@ public class UserController {
 	@GetMapping
 	public ResponseEntity<List<User>> getAll(){
 		List<User> users = new ArrayList<>();
-		users = userRepository.findAll();
+		users = userService.findAll();
 		return new ResponseEntity<>(users, HttpStatus.OK);
 	}
 	
 	
 	@GetMapping(path="/{id}")
-	public ResponseEntity<Optional<User>> getById(@PathVariable Integer id){
+	public ResponseEntity<Optional<User>> getById(@PathVariable Integer id) throws UserNotFoundException{
 		Optional<User> user;
 		try {
-			user = userRepository.findById(id);
+			user = userService.findById(id);
 			return new ResponseEntity<Optional<User>> (user, HttpStatus.OK);
 		} catch (NoSuchElementException nse) {
 			return new ResponseEntity<Optional<User>>(HttpStatus.NOT_FOUND);
@@ -87,7 +74,7 @@ public class UserController {
 	@DeleteMapping(path="/{id}")
 	public ResponseEntity<Optional<User>> deleteById(@PathVariable Integer id){
 		try {
-			userRepository.deleteById(id);
+			userService.deleteById(id);
 			return new ResponseEntity<Optional<User>>(HttpStatus.OK);
 		}catch (NoSuchElementException nse) {
 			return new ResponseEntity<Optional<User>>(HttpStatus.NOT_FOUND);
@@ -96,11 +83,11 @@ public class UserController {
 		
 	
 	@PutMapping("/{id}")
-	public ResponseEntity<User> update(@PathVariable Integer id, @RequestBody User newUser){
-		return userRepository.findById(id)
+	public ResponseEntity<User> update(@PathVariable Integer id, @RequestBody User newUser) throws UserNotFoundException{
+		return userService.findById(id)
 				.map(user -> {
 					user.setName(newUser.getName());
-					User userUpdated = userRepository.save(user);
+					User userUpdated = userService.save(user);
 					return ResponseEntity.ok().body(userUpdated);
 				}).orElse(ResponseEntity.notFound().build());
 	}
