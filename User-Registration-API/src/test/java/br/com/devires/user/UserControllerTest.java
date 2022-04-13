@@ -67,11 +67,16 @@ public class UserControllerTest {
 	@Autowired
 	private 	MockMvc 			mockMvc;
 	
+	@InjectMocks
+	@Autowired
+	private 	UserController		userController; 
+	
 	@MockBean
+	@Autowired
 	private		UserRepository		userRepository;
 	
-	@InjectMocks
-	private 	UserController		userController;
+	
+
 	
 	private final String BASE_URL = "/v1/users";
 	
