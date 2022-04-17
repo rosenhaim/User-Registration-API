@@ -59,10 +59,9 @@ import br.com.devires.user.service.UserService;
  *
  */
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
+
 @AutoConfigureMockMvc
-public class UserControllerTest {
+public class UserControllerTest extends UserRegistrationApiApplicationTests{
 	
 	@Autowired
 	private 	MockMvc 			mockMvc;
